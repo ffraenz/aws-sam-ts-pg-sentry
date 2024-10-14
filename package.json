@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "build": "sam build",
+    "deploy": "sam deploy --config-file samconfig.toml --config-env production"
+  }
+}
