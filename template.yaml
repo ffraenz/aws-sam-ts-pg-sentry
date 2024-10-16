@@ -20,10 +20,10 @@ Globals:
     Timeout: 10
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  DrizzlePgFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      CodeUri: hello-world/
+      CodeUri: function-drizzle-pg/
       Handler: app.lambdaHandler
       Runtime: nodejs20.x
       Architectures:
@@ -33,13 +33,32 @@ Resources:
           NODE_OPTIONS: " --require ./instrument.js --enable-source-maps"
           DATABASE_URL: !Ref DatabaseUrl
           SENTRY_DSN: !Ref SentryDsn
-      Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /hello
-            Method: get
-    Metadata: # Manage esbuild properties
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        Loader:
+          - .node=copy
+        EntryPoints:
+          - app.ts
+          - instrument.ts
+
+  PgFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: function-pg/
+      Handler: app.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          NODE_OPTIONS: " --require ./instrument.js --enable-source-maps"
+          DATABASE_URL: !Ref DatabaseUrl
+          SENTRY_DSN: !Ref SentryDsn
+    Metadata:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
@@ -52,15 +71,9 @@ Resources:
           - instrument.ts
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  DrizzlePgFunction:
+    Description: "Drizzle+pg Lambda Function ARN"
+    Value: !GetAtt DrizzlePgFunction.Arn
+  PgFunction:
+    Description: "pg Lambda Function ARN"
+    Value: !GetAtt PgFunction.Arn

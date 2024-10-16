@@ -1,9 +1,9 @@
 
 # aws-sam-ts-pg-sentry
 
-This repository contains a minimal reproducible example for a Sentry bug report.
+This repository contains a minimal reproducible example for a [Sentry bug report](https://github.com/getsentry/sentry-javascript/issues/13975).
 
-It was created using the following init command:
+It was created using the following init command and [template](https://github.com/aws/aws-sam-cli-app-templates/tree/master/nodejs20.x/hello-ts):
 
 ```bash
 sam init --app-template hello-world-typescript --name aws-sam-ts-pg-sentry --runtime nodejs20.x --architecture arm64 --dependency-manager npm
@@ -11,21 +11,29 @@ sam init --app-template hello-world-typescript --name aws-sam-ts-pg-sentry --run
 
 Tests and test events have been removed.
 
+Functions:
+
+- `function-drizzle-pg` - Using packages Drizzle.js and pg.
+- `function-pg` - Using package pg.
+
 ## Getting started
 
 Install dependencies:
 
 ```bash
-cd hello-world
+cd function-drizzle-pg
+npm install
+cd ..
+cd function-pg
 npm install
 ```
 
-Create local `hello-world/.env` from `hello-world/.env.example`. A free [Neon](https://neon.tech) Postgres database and Sentry account can be used.
+Create local `function-drizzle-pg/.env` from `function-drizzle-pg/.env.example`. A free [Neon](https://neon.tech) Postgres database and Sentry account can be used.
 
 Push database schema:
 
 ```bash
-cd hello-world
+cd function-drizzle-pg
 npm run push
 ```
 
@@ -64,4 +72,4 @@ npm run deploy
 
 ## Test
 
-Run the hello world code by triggering a "Test" via the AWS console.
+Trigger a manual test of the Lambda in the AWS console.
